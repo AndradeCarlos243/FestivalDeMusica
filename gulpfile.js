@@ -2,12 +2,20 @@ const { src, dest, watch, parallel } = require('gulp');
 //CSS
 const sass = require('gulp-sass')(require('sass'));
 const plumber = require('gulp-plumber');
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
+const postcss = require('gulp-postcss');
+const sourcemaps = require('gulp-sourcemaps');
+
 
 //Imagenes
 const webp = require('gulp-webp');
 const imagemin = require('gulp-imagemin');
 const cache = require('gulp-cache');
 const avif = require('gulp-avif');
+
+//Javascript
+const terser = require('gulp-terser-js');
 
 function versionWebp(done)
 {
@@ -45,8 +53,11 @@ function minificarImagenes(done)
 function css(done)
 {
     src('src/scss/**/*.scss')//Identificar el archivo de sass
+        .pipe( sourcemaps.init() )//Iniciar el mapa de archivos
         .pipe( plumber() )//Evitar que se detenga el proceso
         .pipe( sass() )//Compilar el archivo
+        .pipe( postcss([ autoprefixer(), cssnano() ]) )//Aplicar postcss
+        .pipe( sourcemaps.write('.') )//Escribir los archivos de mapa
         .pipe( dest('build/css') );//Almacenar el archivo compilado en la carpeta css
     done(); //Callback para finalizar tarea
 }
@@ -54,7 +65,10 @@ function css(done)
 function javascript(done)
 {
     src('src/js/**/*.js')//Identificar el archivo de sass
+        .pipe( sourcemaps.init() )//Iniciar el mapa de archivos
         .pipe( plumber() )//Evitar que se detenga el proceso
+        .pipe( terser() )//Compilar el archivo
+        .pipe( sourcemaps.write('.') )//Escribir los archivos de mapa
         .pipe( dest('build/js') );//Almacenar el archivo compilado en la carpeta css
     done(); //Callback para finalizar tarea
 }
