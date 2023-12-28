@@ -51,14 +51,24 @@ function css(done)
     done(); //Callback para finalizar tarea
 }
 
+function javascript(done)
+{
+    src('src/js/**/*.js')//Identificar el archivo de sass
+        .pipe( plumber() )//Evitar que se detenga el proceso
+        .pipe( dest('build/js') );//Almacenar el archivo compilado en la carpeta css
+    done(); //Callback para finalizar tarea
+}
+
 function dev(done)
 {
-    watch('src/scss/**/*.scss', css);//Observar cambios en el archivo de sass
+    watch('src/scss/**/*.scss', css);//Observar cambios en los archivos de sass
+    watch('src/js/**/*.js', javascript);//Observar cambios en los archivos de js
     done();
 }
 
+exports.js = javascript; //Exportar la funcion javascript como tarea por defecto
 exports.css = css; //Exportar la funcion css como tarea por defecto
 exports.minificarImagenes = minificarImagenes; //Exportar la funcion minificarImagenes como tarea por defecto
 exports.versionWebp = versionWebp; //Exportar la funcion versionWebp como tarea por defecto
 exports.versionAvif = versionAvif; //Exportar la funcion versionAvif como tarea por defecto
-exports.dev = parallel( versionAvif, minificarImagenes, versionWebp, dev); //Exportar la funcion dev como tarea por defecto
+exports.dev = parallel( versionAvif, minificarImagenes, versionWebp, javascript, dev); //Exportar la funcion dev como tarea por defecto
